@@ -8,6 +8,7 @@ import urllib.request as req
 import sys
 import os
 from html.parser import HTMLParser
+import numpy
 
       
 #-------------------------------------------------------------------------
@@ -87,22 +88,20 @@ class LIFO_Authority_Policy:
     def __init__(self, c):
         self.queue = c.seedURLs[:]
         self.fetched = set([])
+        self.authority = {}
 
     def getURL(self, c, iteration):
         while len(self.queue) != 0 and  self.queue[-1] in self.fetched:
             self.queue.pop()
 
         if len(self.queue) == 0:
-            self.queue = c.seedURLs[:]
-            self.fetched = set([])
+            for n in c.incomingURLs:
+                self.authority[n] = len(c.incomingURLs[n]) + 1
+            ret = numpy.random.choice(list(self.authority.keys()), p=[x / numpy.sum(list(self.authority.values())) for x in list(self.authority.values())])
+            return ret
 
         ret = self.queue.pop()
-        print (ret)
         self.fetched.add(ret)
-        if ret in c.incomingURLs:
-            c.incomingURLs[ret] = c.incomingURLs.get(ret) + 1
-        else:
-            c.incomingURLs[ret] = 1
         return ret
 
     def updateURLs(self, c, retrievedURLs, retrievedURLsWD, iteration):
@@ -137,7 +136,7 @@ class Container:
         # Page (URL) to be fetched next
         self.toFetch = None
         # Number of iterations of a crawler. 
-        self.iterations = 10
+        self.iterations = 50
 
         # If true: store all crawled html pages in the provided directory.
         self.storePages = True
