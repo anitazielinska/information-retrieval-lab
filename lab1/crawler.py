@@ -171,7 +171,7 @@ def main():
             print("Iteration = " + str(iteration + 1) )
             print("=====================================================")
         # Prepare a next page to be fetched
-        generate(c, iteration)
+        generate(c, iteration)gi
         if (c.toFetch == None):
             if c.debug:
                 print("   No page to fetch!")
